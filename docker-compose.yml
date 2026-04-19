@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: shopflow-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: shopflow-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_auth
+      SECRET_KEY: shopflow-super-secret-key
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  product-service:
+    build: ./services/product-service
+    container_name: product-service
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_products
+      SECRET_KEY: shopflow-super-secret-key
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  order-service:
+    build: ./services/order-service
+    container_name: order-service
+    ports:
+      - "3003:3003"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_orders
+      SECRET_KEY: shopflow-super-secret-key
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3002
+      ORDER_SERVICE_URL: http://order-service:3003
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+    restart: unless-stopped
+
+  frontend:
+    build: ./services/frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
