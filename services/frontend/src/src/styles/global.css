@@ -1,0 +1,11 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+button { cursor: pointer; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+button:hover { opacity: 0.9; transform: translateY(-1px); }
+input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
+input:focus { border-color: #6c63ff; }
+.btn-primary { background: #6c63ff; color: white; width: 100%; padding: 13px; font-size: 15px; }
+.btn-danger { background: #ff4757; color: white; padding: 7px 14px; font-size: 13px; }
+.error { color: #ff4757; font-size: 13px; margin-top: 8px; }
+.page-title { font-size: 26px; font-weight: 700; margin-bottom: 24px; color: #222; }
