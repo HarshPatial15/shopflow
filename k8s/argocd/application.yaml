@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/harsh1505/shopflow
+    repoURL: https://github.com/HarshPatial15/shopflow
     targetRevision: main
     path: k8s
   destination:
