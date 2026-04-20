@@ -11,9 +11,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - shopflow_pgdata:/var/lib/postgresql/data
       - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -31,7 +36,8 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_auth
       SECRET_KEY: shopflow-super-secret-key
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
   product-service:
@@ -43,7 +49,8 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_products
       SECRET_KEY: shopflow-super-secret-key
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
   order-service:
@@ -54,9 +61,13 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shopflow_orders
       SECRET_KEY: shopflow-super-secret-key
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
 
   api-gateway:
@@ -78,7 +89,7 @@ services:
     build: ./services/frontend
     container_name: frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       REACT_APP_API_URL: http://localhost:8080
     depends_on:
@@ -86,4 +97,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  shopflow_pgdata:
