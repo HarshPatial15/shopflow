@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/HarshPatial15/shopflow.git
+    targetRevision: main
+    path: helm/ingress
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopflow
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
