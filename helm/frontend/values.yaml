@@ -5,7 +5,7 @@ image:
   pullPolicy: Always
 service:
   type: ClusterIP
-  port: 3000
+  port: 80
 resources:
   requests:
     memory: "64Mi"
