@@ -1,14 +1,11 @@
 replicaCount: 1
-
 image:
   repository: 731872836849.dkr.ecr.ap-south-1.amazonaws.com/shopflow/frontend
   tag: latest
   pullPolicy: Always
-
 service:
   type: ClusterIP
-  port: 3001
-
+  port: 3000
 resources:
   requests:
     memory: "64Mi"
