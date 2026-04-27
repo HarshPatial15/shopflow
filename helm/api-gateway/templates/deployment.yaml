@@ -12,13 +12,20 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: 8080
+          env:
+            - name: AUTH_SERVICE_URL
+              value: "http://auth-service:3001"
+            - name: PRODUCT_SERVICE_URL
+              value: "http://product-service:3002"
+            - name: ORDER_SERVICE_URL
+              value: "http://order-service:3003"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      imagePullSecrets:
-        - name: ecr-secret
